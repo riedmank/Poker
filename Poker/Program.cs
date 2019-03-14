@@ -245,6 +245,11 @@ namespace Poker
             return false;
         }
 
+        /// <summary>
+        /// Only checks hands which are possible based on cards
+        /// </summary>
+        /// <param name="hand">Poker hand</param>
+        /// <returns>String containing best hand found</returns>
         public static string ImprovedCheckHand(Deck<Card> hand)
         {
             SortByValue(hand);
