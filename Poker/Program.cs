@@ -41,12 +41,12 @@ namespace Poker
                 }
             }
             // displays all cards loaded into the deck
-            foreach (Card card in myDeck)
-            {
-                //Console.WriteLine($"{card.Value} of {card.Suit}");
-            }
+            //foreach (Card card in myDeck)
+            //{
+            //    Console.WriteLine($"{card.Value} of {card.Suit}");
+            //}
 
-            /// adds cards to hand
+            // adds cards to hand
             Random rng = new Random();
             Deck<Card> myHand = new Deck<Card>();
             int counter = 52;
@@ -60,8 +60,8 @@ namespace Poker
                 myHand.Add(card);
                 myDeck.Remove(card);
             }
-            CheckHand(myHand);
-            Console.WriteLine("Your hand:");
+
+            Console.WriteLine($"Your hand: {ImprovedCheckHand(myHand)}");
             foreach (Card item in myHand)
             {
                 Console.WriteLine($"{item.Value} of {item.Suit}");
@@ -70,58 +70,18 @@ namespace Poker
             // Used for testing purposes
             Card card1 = new Card(Suit.Diamonds, Value.Two);
             Card card2 = new Card(Suit.Diamonds, Value.Four);
-            Card card3 = new Card(Suit.Diamonds, Value.Seven);
-            Card card4 = new Card(Suit.Hearts, Value.Eight);
-            Card card5 = new Card(Suit.Hearts, Value.Ace);
+            Card card3 = new Card(Suit.Diamonds, Value.Five);
+            Card card4 = new Card(Suit.Diamonds, Value.Six);
+            Card card5 = new Card(Suit.Diamonds, Value.Seven);
             Deck<Card> fakeHand = new Deck<Card>();
             fakeHand.Add(card1);
             fakeHand.Add(card2);
             fakeHand.Add(card3);
             fakeHand.Add(card4);
             fakeHand.Add(card5);
-            //CheckHand(fakeHand);
+            //Console.WriteLine(ImprovedCheckHand(fakeHand));
 
             Console.ReadLine();
-        }
-
-        /// <summary>
-        /// Checks cards for best hand and displays result
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        public static void CheckHand(Deck<Card> hand)
-        {
-            SortByValue(hand);
-
-            bool onePair = CheckPair(hand); //works
-            bool twoPair = CheckTwoPair(hand); //works
-            bool threeOfAKind = CheckThreeOfAKind(hand); //works
-            bool straight = CheckStraight(hand); //works; Ace exception brute force
-            bool flush = CheckFlush(hand); //works
-            bool fullHouse = CheckFullHouse(hand); //works
-            bool fourOfAKind = CheckFourOfAKind(hand); //works
-            bool straightFlush = CheckStraightFlush(hand); //works
-            bool royalFlush = CheckRoyalFlush(hand); //works
-
-            if (royalFlush)
-                Console.WriteLine("You got a royal flush");
-            else if (straightFlush)
-                Console.WriteLine("You got a straight flush");
-            else if (fourOfAKind)
-                Console.WriteLine("You got four of a kind");
-            else if (fullHouse)
-                Console.WriteLine("You got a full house");
-            else if (flush)
-                Console.WriteLine("You got a flush");
-            else if (straight)
-                Console.WriteLine("You got a straight");
-            else if (threeOfAKind)
-                Console.WriteLine("You got three of a kind");
-            else if (twoPair)
-                Console.WriteLine("You got two pair");
-            else if (onePair)
-                Console.WriteLine("You got a pair");
-            else
-                Console.WriteLine($"Your high card is a {hand[4].Value} of {hand[4].Suit}");
         }
 
         /// <summary>
@@ -160,13 +120,10 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckPair(Deck<Card> hand)
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 4; i++)
             {
-                for (int j = 0; j < 5; j++)
-                {
-                    if (hand[i].Value == hand[j].Value && i != j)
-                        return true;
-                }
+                if (hand[i].Value == hand[i + 1].Value)
+                    return true;
             }
             return false;
         }
@@ -178,8 +135,6 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckTwoPair(Deck<Card> hand)
         {
-            if (!CheckPair(hand))
-                return false;
             if (hand[0].Value == hand[1].Value && hand[2].Value == hand[3].Value && hand[0].Value != hand[2].Value && hand[0].Value != hand[4].Value && hand[2].Value != hand[4].Value)
                 return true;
             else if (hand[0].Value == hand[1].Value && hand[3].Value == hand[4].Value && hand[0].Value != hand[3].Value && hand[0].Value != hand[2].Value && hand[3].Value != hand[2].Value)
@@ -196,8 +151,6 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckThreeOfAKind(Deck<Card> hand)
         {
-            if (!CheckPair(hand))
-                return false;
             if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[0].Value != hand[3].Value && hand[0].Value != hand[4].Value)
                 return true;
             else if (hand[1].Value == hand[2].Value && hand[1].Value == hand[3].Value && hand[1].Value != hand[0].Value && hand[1].Value != hand[4].Value)
@@ -214,10 +167,11 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckStraight(Deck<Card> hand)
         {
+            // Ace through Five Straight exception
+            if (hand[0].Value == Value.Two && hand[1].Value == Value.Three && hand[2].Value == Value.Four && hand[3].Value == Value.Five && hand[4].Value == Value.Ace)
+                return true;
             for (int i = 0; i < 4; i++)
             {
-                if (hand[0].Value == Value.Two && hand[1].Value == Value.Three && hand[2].Value == Value.Four && hand[3].Value == Value.Five && hand[4].Value == Value.Ace)
-                    return true;
                 if (hand[i].Value + 1 != hand[i + 1].Value)
                     return false;
             }
@@ -246,8 +200,6 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckFullHouse(Deck<Card> hand)
         {
-            if (!CheckThreeOfAKind(hand))
-                return false;
             if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[3].Value == hand[4].Value && hand[0].Value != hand[3].Value)
                 return true;
             else if (hand[2].Value == hand[3].Value && hand[2].Value == hand[4].Value && hand[0].Value == hand[1].Value && hand[2].Value != hand[0].Value)
@@ -262,8 +214,6 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckFourOfAKind(Deck<Card> hand)
         {
-            if (!CheckPair(hand))
-                return false;
             if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[0].Value == hand[3].Value)
                 return true;
             else if (hand[4].Value == hand[3].Value && hand[4].Value == hand[2].Value && hand[4].Value == hand[1].Value)
@@ -290,11 +240,54 @@ namespace Poker
         /// <returns>True or false</returns>
         public static bool CheckRoyalFlush(Deck<Card> hand)
         {
-            if (hand[0].Value != Value.Ten)
-                return false;
-            else if (CheckStraightFlush(hand))
+            if (CheckStraightFlush(hand))
                 return true;
             return false;
+        }
+
+        public static string ImprovedCheckHand(Deck<Card> hand)
+        {
+            SortByValue(hand);
+            string bestHand = "High Card";
+
+            if (hand[0].Value == Value.Ten)
+            {
+                if (CheckRoyalFlush(hand))
+                    return bestHand = "Royal Flush";
+            }
+            if (hand[0].Suit == hand[1].Suit || (hand[0].Value + 1) == hand[1].Value)
+            {
+                if (CheckStraightFlush(hand))
+                    return bestHand = "Straight Flush";
+            }
+            if ((hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value) || (hand[1].Value == hand[2].Value && hand[1].Value == hand[3].Value))
+            {
+                if (CheckFourOfAKind(hand))
+                    return bestHand = "Four Of A Kind";
+            }
+            if (hand[0].Value == hand[1].Value)
+            { 
+                if (CheckFullHouse(hand))
+                    return bestHand = "Fullhouse";
+            }
+            if (hand[0].Suit == hand[1].Suit || (hand[0].Value + 1) == hand[1].Value)
+            {
+                if (CheckFlush(hand))
+                    return bestHand = "Flush";
+                else if (CheckStraight(hand))
+                    return bestHand = "Straight";
+            }
+            if (hand[0].Value == hand[1].Value || hand[1].Value == hand[2].Value || hand[2].Value == hand[3].Value)
+            {
+                if (CheckThreeOfAKind(hand))
+                    return bestHand = "Three Of A Kind";
+            }            
+            if (CheckTwoPair(hand))
+                return bestHand = "Two Pair";
+            if (CheckPair(hand))
+                return bestHand = "Pair";
+            else
+                return bestHand;
         }
     }
 }

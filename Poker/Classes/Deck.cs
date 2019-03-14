@@ -9,6 +9,7 @@ namespace Poker.Classes
 {
     public class Deck<T> : IEnumerable
     {
+        public int Length { get { return counter + 5; }}
         T[] deck = new T[5];
         int counter = 0;
 
