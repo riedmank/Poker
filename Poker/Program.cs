@@ -61,25 +61,68 @@ namespace Poker
                 myDeck.Remove(card);
             }
 
-            Console.WriteLine($"Your hand: {ImprovedCheckHand(myHand)}");
+            string[] possibleHands = new string[9];
+            possibleHands[0] = "StraightFlush";
+            possibleHands[1] = "FourOfAKind";
+            possibleHands[2] = "FullHouse";
+            possibleHands[3] = "Flush";
+            possibleHands[4] = "Straight";
+            possibleHands[5] = "ThreeOfAKind";
+            possibleHands[6] = "TwoPair";
+            possibleHands[7] = "Pair";
+            possibleHands[8] = "HighCard";
+
+            byte[] results = new byte[9];
+            results[0] = 1; // StraightFlush
+            results[1] = 0; // FourOfAKind
+            results[2] = 0; // FullHouse
+            results[3] = 1; // Flush
+            results[4] = 1; // Straight
+            results[5] = 0; // ThreeOfAKind
+            results[6] = 0; // TwoPair
+            results[7] = 0; // Pair
+            results[8] = 0; // HighCard
+
+            ImprovedCheckHandPlus(myHand, results);
+
+            int result = 0;
+            for (int i = 0; i < results.Length; i++)
+            {
+                if (results[i] == 1)
+                    result = i;
+            }
+
+            Console.WriteLine(possibleHands[result]);
             foreach (Card item in myHand)
             {
                 Console.WriteLine($"{item.Value} of {item.Suit}");
             }
 
-            // Used for testing purposes
-            Card card1 = new Card(Suit.Diamonds, Value.Two);
-            Card card2 = new Card(Suit.Diamonds, Value.Four);
-            Card card3 = new Card(Suit.Diamonds, Value.Five);
-            Card card4 = new Card(Suit.Diamonds, Value.Six);
-            Card card5 = new Card(Suit.Diamonds, Value.Seven);
-            Deck<Card> fakeHand = new Deck<Card>();
-            fakeHand.Add(card1);
-            fakeHand.Add(card2);
-            fakeHand.Add(card3);
-            fakeHand.Add(card4);
-            fakeHand.Add(card5);
-            //Console.WriteLine(ImprovedCheckHand(fakeHand));
+            //// Used for testing purposes
+            //Card card1 = new Card(Suit.Diamonds, Value.Two);
+            //Card card2 = new Card(Suit.Diamonds, Value.Two);
+            //Card card3 = new Card(Suit.Diamonds, Value.Two);
+            //Card card4 = new Card(Suit.Diamonds, Value.Three);
+            //Card card5 = new Card(Suit.Diamonds, Value.Three);
+            //Deck<Card> fakeHand = new Deck<Card>();
+            //fakeHand.Add(card1);
+            //fakeHand.Add(card2);
+            //fakeHand.Add(card3);
+            //fakeHand.Add(card4);
+            //fakeHand.Add(card5);
+
+            //ImprovedCheckHandPlus(fakeHand, results);
+
+            //for (int i = 0; i < results.Length; i++)
+            //{
+            //    if (results[i] == 1)
+            //    {
+            //        result = i;
+            //        break;
+            //    }
+            //}
+
+            //Console.WriteLine(possibleHands[result]);
 
             Console.ReadLine();
         }
@@ -114,185 +157,57 @@ namespace Poker
         }
 
         /// <summary>
-        /// Checks for a pair
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckPair(Deck<Card> hand)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (hand[i].Value == hand[i + 1].Value)
-                    return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Checks for two pair
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckTwoPair(Deck<Card> hand)
-        {
-            if (hand[0].Value == hand[1].Value && hand[2].Value == hand[3].Value && hand[0].Value != hand[2].Value && hand[0].Value != hand[4].Value && hand[2].Value != hand[4].Value)
-                return true;
-            else if (hand[0].Value == hand[1].Value && hand[3].Value == hand[4].Value && hand[0].Value != hand[3].Value && hand[0].Value != hand[2].Value && hand[3].Value != hand[2].Value)
-                return true;
-            else if (hand[1].Value == hand[2].Value && hand[3].Value == hand[4].Value && hand[1].Value != hand[3].Value && hand[0].Value != hand[1].Value && hand[0].Value != hand[3].Value)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Checks for three of a kind
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckThreeOfAKind(Deck<Card> hand)
-        {
-            if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[0].Value != hand[3].Value && hand[0].Value != hand[4].Value)
-                return true;
-            else if (hand[1].Value == hand[2].Value && hand[1].Value == hand[3].Value && hand[1].Value != hand[0].Value && hand[1].Value != hand[4].Value)
-                return true;
-            else if (hand[2].Value == hand[3].Value && hand[2].Value == hand[4].Value && hand[2].Value != hand[0].Value && hand[2].Value != hand[1].Value)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Checks for a straight
+        /// Finds the best Poker hand in the cards provided
         /// </summary>
         /// <param name="hand">Hand of cards</param>
-        /// <returns>True or false</returns>
-        public static bool CheckStraight(Deck<Card> hand)
-        {
-            // Ace through Five Straight exception
-            if (hand[0].Value == Value.Two && hand[1].Value == Value.Three && hand[2].Value == Value.Four && hand[3].Value == Value.Five && hand[4].Value == Value.Ace)
-                return true;
-            for (int i = 0; i < 4; i++)
-            {
-                if (hand[i].Value + 1 != hand[i + 1].Value)
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Checks for flush
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckFlush(Deck<Card> hand)
-        {
-            for (int i = 0; i < 4; i++)
-            {
-                if (hand[i].Suit != hand[i + 1].Suit)
-                    return false;
-            }
-            return true;
-        }
-
-        /// <summary>
-        /// Checks for full house
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckFullHouse(Deck<Card> hand)
-        {
-            if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[3].Value == hand[4].Value && hand[0].Value != hand[3].Value)
-                return true;
-            else if (hand[2].Value == hand[3].Value && hand[2].Value == hand[4].Value && hand[0].Value == hand[1].Value && hand[2].Value != hand[0].Value)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Checks for four of a kind
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckFourOfAKind(Deck<Card> hand)
-        {
-            if (hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value && hand[0].Value == hand[3].Value)
-                return true;
-            else if (hand[4].Value == hand[3].Value && hand[4].Value == hand[2].Value && hand[4].Value == hand[1].Value)
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Checks for straight flush
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckStraightFlush(Deck<Card> hand)
-        {
-            if (!CheckFlush(hand) || !CheckStraight(hand))
-                return false;
-            return true;
-        }
-
-        /// <summary>
-        /// Checks for royal flush
-        /// </summary>
-        /// <param name="hand">Hand</param>
-        /// <returns>True or false</returns>
-        public static bool CheckRoyalFlush(Deck<Card> hand)
-        {
-            if (CheckStraightFlush(hand))
-                return true;
-            return false;
-        }
-
-        /// <summary>
-        /// Only checks hands which are possible based on cards
-        /// </summary>
-        /// <param name="hand">Poker hand</param>
-        /// <returns>String containing best hand found</returns>
-        public static string ImprovedCheckHand(Deck<Card> hand)
+        public static void ImprovedCheckHandPlus(Deck<Card> hand, byte[] results)
         {
             SortByValue(hand);
-            string bestHand = "High Card";
-
-            if (hand[0].Value == Value.Ten)
+            int match = 0;
+            for (int i = 0; i < 4; i++)
             {
-                if (CheckRoyalFlush(hand))
-                    return bestHand = "Royal Flush";
+                if ((hand[i].Value + 1) != hand[i + 1].Value)
+                {
+                    results[0] = 0; // StraightFlush
+                    results[4] = 0; // Straight
+                }
+                if (hand[i].Suit != hand[i + 1].Suit)
+                {
+                    results[0] = 0; // StraightFlush
+                    results[3] = 0; // Flush
+                }
+                if (hand[i].Value == hand[i + 1].Value)
+                    match++;
             }
-            if (hand[0].Suit == hand[1].Suit || (hand[0].Value + 1) == hand[1].Value)
+            if (match == 3)
             {
-                if (CheckStraightFlush(hand))
-                    return bestHand = "Straight Flush";
+                if (hand[0].Value != hand[1].Value || hand[3].Value != hand[4].Value)
+                    results[1] = 1; // FourOfAKind
+                else
+                    results[2] = 1; // FullHouse
             }
-            if ((hand[0].Value == hand[1].Value && hand[0].Value == hand[2].Value) || (hand[1].Value == hand[2].Value && hand[1].Value == hand[3].Value))
+            else if (match == 2)
             {
-                if (CheckFourOfAKind(hand))
-                    return bestHand = "Four Of A Kind";
+                if (hand[0].Value == hand[1].Value && hand[1].Value == hand[2].Value)
+                    results[5] = 1; // ThreeOfAKind
+                else if (hand[1].Value == hand[2].Value && hand[2].Value == hand[3].Value)
+                    results[5] = 1; // ThreeOfAKind
+                else if (hand[2].Value == hand[3].Value && hand[3].Value == hand[4].Value)
+                    results[5] = 1; // ThreeOfAKind
+                else
+                    results[6] = 1; // TwoPair
             }
-            if (hand[0].Value == hand[1].Value)
-            { 
-                if (CheckFullHouse(hand))
-                    return bestHand = "Fullhouse";
-            }
-            if (hand[0].Suit == hand[1].Suit || (hand[0].Value + 1) == hand[1].Value)
-            {
-                if (CheckFlush(hand))
-                    return bestHand = "Flush";
-                else if (CheckStraight(hand))
-                    return bestHand = "Straight";
-            }
-            if (hand[0].Value == hand[1].Value || hand[1].Value == hand[2].Value || hand[2].Value == hand[3].Value)
-            {
-                if (CheckThreeOfAKind(hand))
-                    return bestHand = "Three Of A Kind";
-            }            
-            if (CheckTwoPair(hand))
-                return bestHand = "Two Pair";
-            if (CheckPair(hand))
-                return bestHand = "Pair";
+            else if (match == 1)
+                results[7] = 1; // Pair
             else
-                return bestHand;
+                results[8] = 1; // HighCard
+            if (hand[0].Value == Value.Two && hand[1].Value == Value.Three && hand[2].Value == Value.Four && hand[3].Value == Value.Five && hand[4].Value == Value.Ace) // Ace exception
+            {
+                if (results[3] == 1)
+                    results[0] = 1; // StraightFlush
+                else
+                    results[4] = 1; // Straight
+            }
         }
     }
 }
