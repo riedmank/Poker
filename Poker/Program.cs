@@ -46,19 +46,53 @@ namespace Poker
             //    Console.WriteLine($"{card.Value} of {card.Suit}");
             //}
 
-            // adds cards to hand
-            Random rng = new Random();
             Deck<Card> myHand = new Deck<Card>();
-            int counter = 52;
-            for (int j = 5; j > 0; j--)
+
+            byte[] results = new byte[9];
+            results[0] = 1; // StraightFlush
+            results[1] = 0; // FourOfAKind
+            results[2] = 0; // FullHouse
+            results[3] = 1; // Flush
+            results[4] = 1; // Straight
+            results[5] = 0; // ThreeOfAKind
+            results[6] = 0; // TwoPair
+            results[7] = 0; // Pair
+            results[8] = 0; // HighCard   
+
+            Console.WriteLine("Welcome to Poker++");
+            Console.WriteLine("Would you like to score a random hand or custom hand? (1 for custom, 2 for random)");
+
+            string choice = Console.ReadLine();
+
+            if (choice == "1")
             {
-                Card card = null;
-                while (card == null)
+                for (int i = 0; i < 5; i++)
                 {
-                    card = myDeck.FindCardInDeck(rng.Next(0, counter--));
+                    Console.WriteLine($"Enter value of card {i + 1}: (a, 2 - 10, j, q, k)");
+                    string userValue = Console.ReadLine().ToUpper();
+                    Console.WriteLine($"Enter suit of card {i + 1}: (c, d, h, s)");
+                    string userSuit = Console.ReadLine().ToUpper();
+
+                    myHand.Add(HandBuilder(userValue, userSuit));
                 }
-                myHand.Add(card);
-                myDeck.Remove(card);
+                ImprovedCheckHandPlus(myHand, results);
+            }
+            else if (choice == "2")
+            {
+                // adds cards to hand
+                Random rng = new Random();
+                int counter = 52;
+                for (int j = 5; j > 0; j--)
+                {
+                    Card card = null;
+                    while (card == null)
+                    {
+                        card = myDeck.FindCardInDeck(rng.Next(0, counter--));
+                    }
+                    myHand.Add(card);
+                    myDeck.Remove(card);
+                }
+                ImprovedCheckHandPlus(myHand, results);
             }
 
             string[] possibleHands = new string[9];
@@ -70,40 +104,22 @@ namespace Poker
             possibleHands[5] = "ThreeOfAKind";
             possibleHands[6] = "TwoPair";
             possibleHands[7] = "Pair";
-            possibleHands[8] = "HighCard";
-
-            byte[] results = new byte[9];
-            results[0] = 1; // StraightFlush
-            results[1] = 0; // FourOfAKind
-            results[2] = 0; // FullHouse
-            results[3] = 1; // Flush
-            results[4] = 1; // Straight
-            results[5] = 0; // ThreeOfAKind
-            results[6] = 0; // TwoPair
-            results[7] = 0; // Pair
-            results[8] = 0; // HighCard
-
-            ImprovedCheckHandPlus(myHand, results);
+            possibleHands[8] = "HighCard";                     
 
             int result = 0;
-            for (int i = 0; i < results.Length; i++)
-            {
-                if (results[i] == 1)
-                    result = i;
-            }
-
-            Console.WriteLine(possibleHands[result]);
+            Console.WriteLine("=================================================");
+            Console.WriteLine("Your hand:");
             foreach (Card item in myHand)
             {
                 Console.WriteLine($"{item.Value} of {item.Suit}");
             }
 
             //// Used for testing purposes
-            //Card card1 = new Card(Suit.Diamonds, Value.Two);
-            //Card card2 = new Card(Suit.Diamonds, Value.Two);
-            //Card card3 = new Card(Suit.Diamonds, Value.Two);
-            //Card card4 = new Card(Suit.Diamonds, Value.Three);
-            //Card card5 = new Card(Suit.Diamonds, Value.Three);
+            //Card card1 = new Card(Suit.Hearts, Value.Ace);
+            //Card card2 = new Card(Suit.Hearts, Value.Two);
+            //Card card3 = new Card(Suit.Hearts, Value.Three);
+            //Card card4 = new Card(Suit.Hearts, Value.Four);
+            //Card card5 = new Card(Suit.Hearts, Value.Five);
             //Deck<Card> fakeHand = new Deck<Card>();
             //fakeHand.Add(card1);
             //fakeHand.Add(card2);
@@ -113,18 +129,92 @@ namespace Poker
 
             //ImprovedCheckHandPlus(fakeHand, results);
 
-            //for (int i = 0; i < results.Length; i++)
-            //{
-            //    if (results[i] == 1)
-            //    {
-            //        result = i;
-            //        break;
-            //    }
-            //}
-
-            //Console.WriteLine(possibleHands[result]);
+            for (int i = 0; i < results.Length; i++)
+            {
+                if (results[i] == 1)
+                {
+                    result = i;
+                    break;
+                }
+            }
+            Console.WriteLine("=================================================");
+            Console.WriteLine(possibleHands[result]);
 
             Console.ReadLine();
+        }
+
+        public static Card HandBuilder(string userValue, string userSuit)
+        {            
+            Value value = new Value();
+            Suit suit = new Suit();
+
+            switch(userValue)
+            {
+                case "A":
+                    value = Value.Ace;
+                    break;
+                case "2":
+                    value = Value.Two;
+                    break;
+                case "3":
+                    value = Value.Three;
+                    break;
+                case "4":
+                    value = Value.Four;
+                    break;
+                case "5":
+                    value = Value.Five;
+                    break;
+                case "6":
+                    value = Value.Six;
+                    break;
+                case "7":
+                    value = Value.Seven;
+                    break;
+                case "8":
+                    value = Value.Eight;
+                    break;
+                case "9":
+                    value = Value.Nine;
+                    break;
+                case "10":
+                    value = Value.Ten;
+                    break;
+                case "J":
+                    value = Value.Jack;
+                    break;
+                case "Q":
+                    value = Value.Queen;
+                    break;
+                case "K":
+                    value = Value.King;
+                    break;
+                default:
+                    Console.WriteLine("You didn't pick a correct value. Goodbye.");
+                    break;
+            }
+
+            switch (userSuit)
+            {
+                case "C":
+                    suit = Suit.Clubs;
+                    break;
+                case "D":
+                    suit = Suit.Diamonds;
+                    break;
+                case "H":
+                    suit = Suit.Hearts;
+                    break;
+                case "S":
+                    suit = Suit.Spades;
+                    break;
+                default:
+                    Console.WriteLine("You didn't pick a correct suit. Goodbye.");
+                    break;
+            }
+
+            Card card = new Card(suit, value);
+            return card;
         }
 
         /// <summary>
