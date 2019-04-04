@@ -9,8 +9,8 @@ namespace Poker.Classes
 {
     public class Deck<T> : IEnumerable
     {
-        public int Length { get { return counter + 5; }}
-        T[] deck = new T[5];
+        public int Length { get { return counter; }}
+        T[] deck = new T[1];
         int counter = 0;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Poker.Classes
         public void Add(T card)
         {
             if (counter == deck.Length)
-                Array.Resize(ref deck, deck.Length * 2);
+                Array.Resize(ref deck, deck.Length + 1);
             deck[counter++] = card;
         }
 
@@ -59,16 +59,35 @@ namespace Poker.Classes
         }
 
         /// <summary>
+        /// Creates a new deck and puts only the cards with a specific suit in the deck
+        /// </summary>
+        /// <param name="suit">Takes in a suite</param>
+        /// <returns>Returns a deck of only one suit</returns>
+        public Deck<Card> ShowSuit(Suit suit)
+        {
+            Deck<Card> DeckToReturn = new Deck<Card>();
+            for (int i = 0; i < counter; i++)
+            {
+                Card temp = (Card)Convert.ChangeType(deck[i], typeof(Card));
+                if (temp.Suit == suit)
+                    DeckToReturn.Add(temp);
+            }
+            return DeckToReturn;
+        }
+
+        /// <summary>
         /// Finds a card in the deck at a specific index
         /// </summary>
         /// <param name="index">Integer index in deck</param>
         /// <returns>Returns card at index in deck</returns>
-        public T FindCardInDeck(int index)
+        public bool FindCardInDeck(Deck<Card> hand, Value target)
         {
-            if (index > counter)
-                return default(T);
-            else
-                return deck[index];
+            foreach (Card card in hand)
+            {
+                if (card.Value == target)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
