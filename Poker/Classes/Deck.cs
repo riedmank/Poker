@@ -76,10 +76,11 @@ namespace Poker.Classes
         }
 
         /// <summary>
-        /// Finds a card in the deck at a specific index
+        /// Finds a card in the deck with respect to value only
         /// </summary>
-        /// <param name="index">Integer index in deck</param>
-        /// <returns>Returns card at index in deck</returns>
+        /// <param name="hand">Hand of cards</param>
+        /// <param name="target">Target card</param>
+        /// <returns>True or false</returns>
         public bool FindCardInDeck(Deck<Card> hand, Value target)
         {
             foreach (Card card in hand)
@@ -88,6 +89,35 @@ namespace Poker.Classes
                     return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Finds a card in the deck including Suit
+        /// </summary>
+        /// <param name="hand">Hand of cards</param>
+        /// <param name="target">Target card</param>
+        /// <returns>True or false</returns>
+        public bool FindCardInDeckWithSuit(Deck<Card> hand, Suit suitTarget, Value valueTarget)
+        {
+            foreach (Card card in hand)
+            {
+                if (card.Suit == suitTarget && card.Value == valueTarget)
+                    return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Finds a card in the deck by index
+        /// </summary>
+        /// <param name="index">Index of the card</param>
+        /// <returns>The card or default</returns>
+        public T FindCardInDeckByIndex(int index)
+        {
+            if (index > counter)
+                return default(T);
+            else
+                return deck[index];
         }
 
         /// <summary>
