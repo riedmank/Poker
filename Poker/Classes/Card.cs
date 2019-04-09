@@ -8,7 +8,7 @@ namespace Poker.Classes
 {
     public class Card
     {
-        public Suit Suit { get; set; }
+        public Suit? Suit { get; set; }
         public virtual Value? Value { get; set; }
 
         public Card(Suit suit, Value value)
