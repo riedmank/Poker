@@ -79,7 +79,7 @@ namespace Poker
 
             if (choice == "1")
             {
-                for (int i = 0; i < 5; i++)
+                for (int i = 0; i < 7; i++)
                 {
                     Console.WriteLine($"Enter value of card {i + 1}: (a, 2 - 10, j, q, k)");
                     string userValue = Console.ReadLine().ToUpper();
@@ -95,7 +95,7 @@ namespace Poker
                 // adds cards to hand
                 Random rng = new Random();
                 int counter = 52;
-                for (int j = 5; j > 0; j--)
+                for (int j = 7; j > 0; j--)
                 {
                     Card card = null;
                     while (card == null)
@@ -143,7 +143,7 @@ namespace Poker
                     break;
                 }
             }
-            //Console.WriteLine("=================================================");
+            Console.WriteLine("=================================================");
             Console.WriteLine(possibleHands[result]);
 
             Console.ReadLine();
@@ -235,9 +235,9 @@ namespace Poker
         /// <param name="hand">Hand that was dealt</param>
         public static void Sort(Deck<Card> hand)
         {
-            for (int i = 0; i < hand.Length - 1; i++)
+            for (int i = 0; i < 7; i++)
             {
-                for (int j = 0; j < 4; j++)
+                for (int j = 0; j < 6; j++)
                 {
                     if (hand[j].Value > hand[j + 1].Value)
                         Swap(hand, j, j + 1);
@@ -305,7 +305,7 @@ namespace Poker
                     maxSuit = Suit.Spades;
             }
 
-            for (int i = 1; i < hand.Length; i++)
+            for (int i = 1; i < 7; i++)
             {
                 if (checkStraightFlush.Item2 < 4) // while a StraightFlush hasn't been found
                 {

@@ -9,8 +9,8 @@ namespace Poker.Classes
 {
     public class Deck<T> : IEnumerable
     {
-        public int Length { get { return counter; }}
-        T[] deck = new T[1];
+        public int Length { get { return counter + 5; }}
+        T[] deck = new T[5];
         int counter = 0;
 
         /// <summary>
@@ -31,7 +31,7 @@ namespace Poker.Classes
         public void Add(T card)
         {
             if (counter == deck.Length)
-                Array.Resize(ref deck, deck.Length + 1);
+                Array.Resize(ref deck, deck.Length * 2);
             deck[counter++] = card;
         }
 
