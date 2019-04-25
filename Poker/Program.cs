@@ -36,24 +36,35 @@ namespace Poker
                     myDeck.Add(card);
                 }
             }
-            // displays all cards loaded into the deck
-            //foreach (Card card in myDeck)
-            //{
-            //    Console.WriteLine($"{card.Value} of {card.Suit}");
-            //}
 
-            Deck<Card> myHand = new Deck<Card>();
+            Deck<Card> playerOneHand = new Deck<Card>();
+            Deck<Card> playerTwoHand = new Deck<Card>();
 
-            byte[] results = new byte[9];
-            results[0] = 1; // StraightFlush
-            results[1] = 0; // FourOfAKind
-            results[2] = 0; // FullHouse
-            results[3] = 0; // Flush
-            results[4] = 1; // Straight
-            results[5] = 0; // ThreeOfAKind
-            results[6] = 0; // TwoPair
-            results[7] = 0; // Pair
-            results[8] = 1; // HighCard   
+            byte[] playerOneResults = new byte[9];
+            playerOneResults[0] = 0; // StraightFlush
+            playerOneResults[1] = 0; // FourOfAKind
+            playerOneResults[2] = 0; // FullHouse
+            playerOneResults[3] = 0; // Flush
+            playerOneResults[4] = 1; // Straight
+            playerOneResults[5] = 0; // ThreeOfAKind
+            playerOneResults[6] = 0; // TwoPair
+            playerOneResults[7] = 0; // Pair
+            playerOneResults[8] = 1; // HighCard
+            int playerOneResult = 0;
+
+            byte[] playerTwoResults = new byte[9];
+            playerTwoResults[0] = 0; // StraightFlush
+            playerTwoResults[1] = 0; // FourOfAKind
+            playerTwoResults[2] = 0; // FullHouse
+            playerTwoResults[3] = 0; // Flush
+            playerTwoResults[4] = 1; // Straight
+            playerTwoResults[5] = 0; // ThreeOfAKind
+            playerTwoResults[6] = 0; // TwoPair
+            playerTwoResults[7] = 0; // Pair
+            playerTwoResults[8] = 1; // HighCard
+            int playerTwoResult = 0;
+
+            int winner = 0;
 
             string[] possibleHands = new string[9];
             possibleHands[0] = "StraightFlush";
@@ -66,81 +77,145 @@ namespace Poker
             possibleHands[7] = "Pair";
             possibleHands[8] = "HighCard";
 
-            int result = 0;
-
-            Console.WriteLine("Welcome to Poker++");
+            Console.WriteLine("Welcome to Poker");
             Console.WriteLine("Would you like to score a random hand or custom hand? (1 for custom, 2 for random)");
 
             string choice = Console.ReadLine();
 
             if (choice == "1")
             {
-                for (int i = 0; i < 7; i++)
+                Console.WriteLine("PlayerOne hand:");
+                for (int i = 0; i < 5; i++)
                 {
                     Console.WriteLine($"Enter value of card {i + 1}: (a, 2 - 10, j, q, k)");
                     string userValue = Console.ReadLine().ToUpper();
                     Console.WriteLine($"Enter suit of card {i + 1}: (c, d, h, s)");
                     string userSuit = Console.ReadLine().ToUpper();
 
-                    myHand.Add(HandBuilder(userValue, userSuit));
+                    playerOneHand.Add(HandBuilder(userValue, userSuit));
                 }
-                CheckHand(myHand, results);
+                Console.WriteLine("==============================================");
+                Console.WriteLine("PlayerTwo hand:");
+                for (int i = 0; i < 5; i++)
+                {
+                    Console.WriteLine($"Enter value of card {i + 1}: (a, 2 - 10, j, q, k)");
+                    string userValue = Console.ReadLine().ToUpper();
+                    Console.WriteLine($"Enter suit of card {i + 1}: (c, d, h, s)");
+                    string userSuit = Console.ReadLine().ToUpper();
+
+                    playerTwoHand.Add(HandBuilder(userValue, userSuit));
+                }
+                CheckHandFiveCards(playerOneHand, playerOneResults);
+                CheckHandFiveCards(playerTwoHand, playerTwoResults);
             }
             else if (choice == "2")
             {
                 // adds cards to hand
                 Random rng = new Random();
                 int counter = 52;
-                for (int j = 7; j > 0; j--)
+                for (int j = 5; j > 0; j--)
                 {
                     Card card = null;
                     while (card == null)
                     {
                         card = myDeck.FindCardInDeckByIndex(rng.Next(0, counter--));
                     }
-                    myHand.Add(card);
+                    playerOneHand.Add(card);
                     myDeck.Remove(card);
                 }
-                CheckHand(myHand, results);
+
+                for (int j = 5; j > 0; j--)
+                {
+                    Card card = null;
+                    while (card == null)
+                    {
+                        card = myDeck.FindCardInDeckByIndex(rng.Next(0, counter--));
+                    }
+                    playerTwoHand.Add(card);
+                    myDeck.Remove(card);
+                }
+                CheckHandFiveCards(playerOneHand, playerOneResults);
+                CheckHandFiveCards(playerTwoHand, playerTwoResults);
             }
 
             Console.WriteLine("=================================================");
-            Console.WriteLine("Your hand:");
-            foreach (Card item in myHand)
+            Console.WriteLine("PlayerOne hand:");
+            foreach (Card item in playerOneHand)
+            {
+                Console.WriteLine($"{item.Value} of {item.Suit}");
+            }
+            Console.WriteLine("=================================================");
+            Console.WriteLine("PlayerTwo hand:");
+            foreach (Card item in playerTwoHand)
             {
                 Console.WriteLine($"{item.Value} of {item.Suit}");
             }
 
+            winner = GetWinner(playerOneHand, playerOneResults, playerTwoHand, playerTwoResults);
+
             //// Used for testing purposes
-            //Card card1 = new Card(Suit.Spades, Value.Seven);
-            //Card card2 = new Card(Suit.Hearts, Value.Nine);
-            //Card card3 = new Card(Suit.Clubs, Value.Ten);
-            //Card card4 = new Card(Suit.Diamonds, Value.Jack);
-            //Card card5 = new Card(Suit.Hearts, Value.Queen);
-            //Card card6 = new Card(Suit.Hearts, Value.Queen);
-            //Card card7 = new Card(Suit.Spades, Value.Ace);
+            //Card card0 = new Card(Suit.Clubs, Value.Two);
+            //Card card1 = new Card(Suit.Clubs, Value.Three);
+            //Card card2 = new Card(Suit.Clubs, Value.Four);
+            //Card card3 = new Card(Suit.Clubs, Value.Seven);
+            //Card card4 = new Card(Suit.Hearts, Value.Seven);
 
-            //Deck<Card> fakeHand = new Deck<Card>();
-            //fakeHand.Add(card1);
-            //fakeHand.Add(card2);
-            //fakeHand.Add(card3);
-            //fakeHand.Add(card4);
-            //fakeHand.Add(card5);
-            //fakeHand.Add(card6);
-            //fakeHand.Add(card7);
+            //Card card5 = new Card(Suit.Spades, Value.Two);
+            //Card card6 = new Card(Suit.Spades, Value.Three);
+            //Card card7 = new Card(Suit.Spades, Value.Four);
+            //Card card8 = new Card(Suit.Diamonds, Value.Seven);
+            //Card card9 = new Card(Suit.Spades, Value.Seven);
 
-            //CheckHand(fakeHand, results);
+            //Deck<Card> fakeHandPlayerOne = new Deck<Card>();
+            //fakeHandPlayerOne.Add(card0);
+            //fakeHandPlayerOne.Add(card1);
+            //fakeHandPlayerOne.Add(card2);
+            //fakeHandPlayerOne.Add(card3);
+            //fakeHandPlayerOne.Add(card4);
 
-            for (int i = 0; i < results.Length; i++)
+            //Deck<Card> fakeHandPlayerTwo = new Deck<Card>();
+            //fakeHandPlayerTwo.Add(card5);
+            //fakeHandPlayerTwo.Add(card6);
+            //fakeHandPlayerTwo.Add(card7);
+            //fakeHandPlayerTwo.Add(card8);
+            //fakeHandPlayerTwo.Add(card9);
+
+            //CheckHandFiveCards(fakeHandPlayerOne, playerOneResults);
+            //CheckHandFiveCards(fakeHandPlayerTwo, playerTwoResults);
+
+            //winner = GetWinner(fakeHandPlayerOne, playerOneResults, fakeHandPlayerTwo, playerTwoResults);
+
+            for (int i = 0; i < playerOneResults.Length; i++)
             {
-                if (results[i] == 1)
+                if (playerOneResults[i] == 1)
                 {
-                    result = i;
+                    playerOneResult = i;
                     break;
                 }
             }
+
+            for (int i = 0; i < playerTwoResults.Length; i++)
+            {
+                if (playerTwoResults[i] == 1)
+                {
+                    playerTwoResult = i;
+                    break;
+                }
+            }
+
             Console.WriteLine("=================================================");
-            Console.WriteLine(possibleHands[result]);
+            if (winner == 1)
+            {
+                Console.WriteLine("PlayerOne wins with:");
+                Console.WriteLine(possibleHands[playerOneResult]);
+            }
+            else if (winner == 2)
+            {
+                Console.WriteLine("PlayerTwo wins with:");
+                Console.WriteLine(possibleHands[playerTwoResult]);
+            }
+            else
+                Console.WriteLine("Players tie. Split pot");
 
             Console.ReadLine();
         }
@@ -226,14 +301,192 @@ namespace Poker
         }
 
         /// <summary>
+        /// Finds the winner between two hands of cards
+        /// </summary>
+        /// <param name="playerOneHand">PlayerOne hand of cards</param>
+        /// <param name="playerOneResults">PlayerOne results from checkHand</param>
+        /// <param name="playerTwoHand">PlayerTwo hand of cards</param>
+        /// <param name="playerTwoResults">PlayerTwo results from checkHand</param>
+        public static int GetWinner(Deck<Card> playerOneHand, byte[] playerOneResults, Deck<Card> playerTwoHand, byte[] playerTwoResults)
+        {
+            int winner = 0;
+            for (int i = 0; i < playerOneResults.Length; i++)
+            {
+                if (playerOneResults[i] == 1 && playerTwoResults[i] == 0)
+                {
+                    winner = 1;
+                    break;
+                }
+                else if (playerOneResults[i] == 0 && playerTwoResults[i] == 1)
+                {
+                    winner = 2;
+                    break;
+                }
+                else if (playerOneResults[i] == 1 && playerTwoResults[i] == 1)
+                {
+                    if (i == 0 || i == 3 || i == 4 || i == 8)
+                    {
+                        for (int j = 4; j >= 0; j--)
+                        {
+                            if (playerOneHand[j].Value > playerTwoHand[j].Value)
+                            {
+                                winner = 1;
+                                break;
+                            }
+                            if (playerOneHand[j].Value < playerTwoHand[j].Value)
+                            {
+                                winner = 2;
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                    else if (i == 1 || i == 2 || i == 5)
+                    {
+                        if (playerOneHand[2].Value > playerTwoHand[2].Value)
+                        {
+                            winner = 1;
+                            break;
+                        }
+                        if (playerOneHand[2].Value < playerTwoHand[2].Value)
+                        {
+                            winner = 2;
+                            break;
+                        }
+                    }
+                    else if (i == 6 || i == 7)
+                    {
+                        Tuple<Value?, int> match1PlayerOne = new Tuple<Value?, int>(playerOneHand[0].Value, 0);
+                        Tuple<Value?, int> match2PlayerOne = new Tuple<Value?, int>(null, 0);
+                        Value? highCardPlayerOne = playerOneHand[0].Value;
+                        Tuple<Value?, int> match1PlayerTwo = new Tuple<Value?, int>(playerTwoHand[0].Value, 0);
+                        Tuple<Value?, int> match2PlayerTwo = new Tuple<Value?, int>(null, 0);
+                        Value? highCardPlayerTwo = playerTwoHand[0].Value;
+                        for (int k = 1; k < 5; k++)
+                        {
+                            // Get playerOne matches
+                            if (playerOneHand[k].Value == match1PlayerOne.Item1 || playerOneHand[k].Value == match2PlayerOne.Item1)
+                            {
+                                if (playerOneHand[k].Value == match1PlayerOne.Item1)
+                                    match1PlayerOne = new Tuple<Value?, int>(playerOneHand[k].Value, (match1PlayerOne.Item2 + 1));
+                                if (playerOneHand[k].Value == match2PlayerOne.Item1)
+                                    match2PlayerOne = new Tuple<Value?, int>(playerOneHand[k].Value, (match2PlayerOne.Item2 + 1));
+                            }
+                            else
+                            {
+                                if (match1PlayerOne.Item2 == 0)
+                                    match1PlayerOne = new Tuple<Value?, int>(playerOneHand[k].Value, 0);
+
+                                if (match2PlayerOne.Item2 == 0)
+                                    match2PlayerOne = new Tuple<Value?, int>(playerOneHand[k].Value, 0);
+                            }
+                            // Get playerTwo matches
+                            if (playerTwoHand[k].Value == match1PlayerTwo.Item1 || playerTwoHand[k].Value == match2PlayerTwo.Item1)
+                            {
+                                if (playerTwoHand[k].Value == match1PlayerTwo.Item1)
+                                    match1PlayerTwo = new Tuple<Value?, int>(playerTwoHand[k].Value, (match1PlayerTwo.Item2 + 1));
+                                if (playerTwoHand[k].Value == match2PlayerTwo.Item1)
+                                    match2PlayerTwo = new Tuple<Value?, int>(playerTwoHand[k].Value, (match2PlayerTwo.Item2 + 1));
+                            }
+                            else
+                            {
+                                if (match1PlayerTwo.Item2 == 0)
+                                    match1PlayerTwo = new Tuple<Value?, int>(playerTwoHand[k].Value, 0);
+                                if (match2PlayerTwo.Item2 == 0)
+                                    match2PlayerTwo = new Tuple<Value?, int>(playerTwoHand[k].Value, 0);
+                            }
+
+                            // Find HighCard
+                            if (playerOneHand[k].Value > highCardPlayerOne && playerOneHand[k].Value != match1PlayerOne.Item1 && playerOneHand[k].Value != match2PlayerOne.Item1)
+                                highCardPlayerOne = playerOneHand[k].Value;
+                            if (playerTwoHand[k].Value > highCardPlayerTwo && playerTwoHand[k].Value != match1PlayerTwo.Item1 && playerTwoHand[k].Value != match2PlayerTwo.Item1)
+                                highCardPlayerTwo = playerTwoHand[k].Value;
+                        }
+
+                        if (i == 6)
+                        {
+                            if (match2PlayerOne.Item1 > match2PlayerTwo.Item1)
+                            {
+                                winner = 1;
+                                break;
+                            }
+                            else if (match2PlayerOne.Item1 < match2PlayerTwo.Item1)
+                            {
+                                winner = 2;
+                                break;
+                            }
+                            else
+                            {
+                                if (match1PlayerOne.Item1 > match1PlayerTwo.Item1)
+                                {
+                                    winner = 1;
+                                    break;
+                                }
+                                else if (match1PlayerOne.Item1 < match1PlayerTwo.Item1)
+                                {
+                                    winner = 2;
+                                    break;
+                                }
+                                else
+                                {
+                                    if (highCardPlayerOne > highCardPlayerTwo)
+                                    {
+                                        winner = 1;
+                                        break;
+                                    }
+                                    else if (highCardPlayerOne < highCardPlayerTwo)
+                                    {
+                                        winner = 2;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (i == 7)
+                        {
+                            if (match1PlayerOne.Item1 > match1PlayerTwo.Item1)
+                            {
+                                winner = 1;
+                                break;
+                            }
+                            else if (match1PlayerOne.Item1 < match1PlayerTwo.Item1)
+                            {
+                                winner = 2;
+                                break;
+                            }
+                            else
+                            {
+                                for (int l = 4; l >= 0; l--)
+                                {
+                                    if (playerOneHand[l].Value != match1PlayerOne.Item1 && playerTwoHand[l].Value == match1PlayerTwo.Item1)
+                                    {
+                                        winner = 1;
+                                        break;
+                                    }
+                                    if (playerOneHand[l].Value == match1PlayerOne.Item1 && playerTwoHand[l].Value != match1PlayerTwo.Item1)
+                                    {
+                                        winner = 2;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            return winner;
+        }
+
+        /// <summary>
         /// Sorts the cards in the hand by value
         /// </summary>
         /// <param name="hand">Hand that was dealt</param>
         public static void Sort(Deck<Card> hand)
         {
-            for (int i = 0; i < 7; i++)
+            for (int i = 0; i < 5; i++)
             {
-                for (int j = 0; j < 6; j++)
+                for (int j = 0; j < 4; j++)
                 {
                     if (hand[j].Value > hand[j + 1].Value)
                         Swap(hand, j, j + 1);
@@ -255,10 +508,11 @@ namespace Poker
         }
 
         /// <summary>
-        /// Finds the best Poker hand in the cards provided
+        /// Finds the best Poker hand in the seven cards provided
         /// </summary>
-        /// <param name="hand">Hand of cards</param>
-        public static void CheckHand(Deck<Card> hand, byte[] results)
+        /// <param name="hand">Hand of seven cards</param>
+        /// <param name="results">Array of hand results</param>
+        public static void CheckHandSevenCards(Deck<Card> hand, byte[] results)
         {
             Sort(hand);  
                        
@@ -386,6 +640,92 @@ namespace Poker
 
             // Check for Pair
             if (match1.Item2 == 1 || match2.Item2 == 1 || match3.Item2 == 1)
+                results[7] = 1; // Pair
+        }
+
+        /// <summary>
+        /// Finds the best Poker hand in the five cards provided
+        /// </summary>
+        /// <param name="hand">Hand of five cards</param>
+        /// <param name="results">Array of hand results</param>
+        public static void CheckHandFiveCards(Deck<Card> hand, byte[] results)
+        {
+            Sort(hand);
+
+            Tuple<Value?, int> match1 = new Tuple<Value?, int>(hand[0].Value, 0);
+            Tuple<Value?, int> match2 = new Tuple<Value?, int>(null, 0);
+            Tuple<Suit?, int> suitMatch = new Tuple<Suit?, int>(hand[0].Suit, 0);
+            Tuple<Value?, int> sequence = new Tuple<Value?, int>(hand[0].Value, 0);
+
+            for (int i = 1; i < 5; i++)
+            {
+                // Sequence checks
+                if (hand[i].Value == (sequence.Item1 + 1))
+                    sequence = new Tuple<Value?, int>(hand[i].Value, (sequence.Item2 + 1));
+                else
+                    sequence = new Tuple<Value?, int>(hand[i].Value, 0);
+
+                // Suit checks
+                if (hand[i].Suit == suitMatch.Item1)
+                    suitMatch = new Tuple<Suit?, int>(hand[i].Suit, (suitMatch.Item2 + 1));
+                else
+                    suitMatch = new Tuple<Suit?, int>(hand[i].Suit, 0);
+
+                // Match checks
+                if (hand[i].Value == match1.Item1 || hand[i].Value == match2.Item1)
+                {
+                    if (hand[i].Value == match1.Item1)
+                        match1 = new Tuple<Value?, int>(hand[i].Value, (match1.Item2 + 1));
+                    if (hand[i].Value == match2.Item1)
+                        match2 = new Tuple<Value?, int>(hand[i].Value, (match2.Item2 + 1));
+                }
+                else
+                {
+                    if (match1.Item2 == 0)
+                        match1 = new Tuple<Value?, int>(hand[i].Value, 0);
+                    else if (match2.Item2 == 0)
+                        match2 = new Tuple<Value?, int>(hand[i].Value, 0);
+                }
+            }
+
+            // Check for StraightFlush
+            if (sequence.Item2 == 4 && suitMatch.Item2 == 4)
+                results[0] = 1; // StraightFlush
+
+            // Check for StraightFlush with Ace Exception
+            if (hand.FindCardInDeck(hand, Value.Ace) && hand.FindCardInDeck(hand, Value.Two) && hand.FindCardInDeck(hand, Value.Three) && hand.FindCardInDeck(hand, Value.Four) && hand.FindCardInDeck(hand, Value.Five) && suitMatch.Item2 == 4)
+                results[0] = 1; // StraightFlush
+
+            // Check for FourOfAKind
+            if (match1.Item2 == 3 || match2.Item2 == 3)
+                results[1] = 1; // FourOfAKind
+
+            // Check for FullHouse
+            if ((match1.Item2 == 2 && match2.Item2 == 1) || (match1.Item2 == 1 && match2.Item2 == 2))
+                results[2] = 1; // FullHouse
+
+            // Check for Flush
+            if (suitMatch.Item2 == 4)
+                results[3] = 1; // Flush
+
+            // Check for Straight
+            if (sequence.Item2 < 4)
+                results[4] = 0; // Straight
+
+            // Check for Straight with Ace Exception
+            if (hand.FindCardInDeck(hand, Value.Ace) && hand.FindCardInDeck(hand, Value.Two) && hand.FindCardInDeck(hand, Value.Three) && hand.FindCardInDeck(hand, Value.Four) && hand.FindCardInDeck(hand, Value.Five))
+                results[4] = 1; // Straight
+
+            // Check for ThreeOfAKind
+            if (match1.Item2 == 2 || match2.Item2 == 2)
+                results[5] = 1; // ThreeOfAKind
+
+            // Check for TwoPair
+            if (match1.Item2 == 1 && match2.Item2 == 1)
+                results[6] = 1; // TwoPair
+
+            // Check for Pair
+            if (match1.Item2 == 1 || match2.Item2 == 1)
                 results[7] = 1; // Pair
         }
     }
